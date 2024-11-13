@@ -1,34 +1,28 @@
 from outlook import Outlook
-import pandas as pd
 import time
 import sys
 
-file_path = r"ПУТЬ ДО ФАЙЛА"
+def main():
+    outlook = Outlook()
+    file_path = r"C:\Users\vlad\PycharmProjects\pythonProject\src\СПАРК_Выборка_компаний_20241111_1330_1.xlsx"
+    subject = "Тема сообщения"
+    message = "Содержание сообщения"
 
-df = pd.read_excel(file_path)
-
-for email_cnt in range(3, 5000):
-    email_column = df.iloc[email_cnt, 3]
-
-    if isinstance(email_column, str):
-        email_column = email_column.split(",")
-        for email in email_column:
-            if email.find("@") != -1:
-                email = email.strip()
-                print(email)
-
-outlook = Outlook()
-while True:
     try:
-        subject = "Тема сообщения"
-        message = "Содержание сообщения"
-        recipient = "Получатель сообщения"
+        mail_recipients = outlook.extract_mails(file_path=file_path, mail_cnt=5)
 
-        outlook.send_mail(message, subject, recipient)
+        for recipient in mail_recipients:
+            print(f"---- Sending a message to the next mail -> {recipient} ----")
+            outlook.send_message(message, subject, recipient)
+            print("\n**** Pausing for 1 seconds. ****\n")
+            time.sleep(1)
 
-        print('Pausing for 5 seconds.')
-        time.sleep(5)
+        outlook.close()
 
     except KeyboardInterrupt as e:
         outlook.close()
         sys.exit()
+
+
+if __name__ == "__main__":
+    main()
